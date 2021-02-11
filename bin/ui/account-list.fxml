@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="accountListPane" prefHeight="440.0" prefWidth="500.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <Label prefHeight="53.0" prefWidth="192.0" text="User account list" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="Forte" size="25.0" />
+         </font>
+      </Label>
+   </top>
+   <center>
+      <TableView fx:id="tvAccountList" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="308.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="tcUsername" prefWidth="90.0" text="Username" />
+          <TableColumn fx:id="tcGender" prefWidth="90.0" text="Gender" />
+            <TableColumn fx:id="tcCareer" prefWidth="90.0" text="Career" />
+            <TableColumn fx:id="tcBirthday" prefWidth="90.0" text="Birthday" />
+            <TableColumn fx:id="tcBrowser" prefWidth="90.0" text="Browser" />
+        </columns>
+      </TableView>
+   </center>
+   <bottom>
+      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="selectPicture" fitHeight="37.0" fitWidth="78.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS" />
+            <Label fx:id="txtUsername" prefHeight="38.0" prefWidth="181.0" />
+            <Button mnemonicParsing="false" onAction="#logOut" prefHeight="36.0" prefWidth="99.0" text="Log out" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>
