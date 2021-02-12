@@ -14,15 +14,19 @@ public class Classroom {
 			users.add(new UserAccount(userName, password, image, gender, career, birthday, browser));
 		}
 		
+		public void addContact(String userName, String password) {
+			users.add(new UserAccount(userName, password));
+		}
+		
 		public List<UserAccount> getContacts(){
 			return users; 
 		}
 		
-		public boolean validateUser(String username, String password) {
+		public boolean validateUser(String userName, String password) {
 			boolean validate=false;
 			for(int i=0; i<users.size() && !validate;i++) {
 				UserAccount user = users.get(i);
-				if(user.getUserName().equals(username) && user.getPassword().equals(password)) {
+				if(user.getUserName().equals(userName) && user.getPassword().equals(password)) {
 					validate=true;
 				}
 			}

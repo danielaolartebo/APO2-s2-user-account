@@ -20,6 +20,11 @@ public class UserAccount {
 		
 	}
 	
+	public UserAccount(String userName, String password) {
+		this.userName=userName;
+		this.password=password;
+	}
+
 	public String getUserName() {
 		return userName;
 	}
@@ -75,4 +80,5 @@ public class UserAccount {
 	public void setBrowser(String browser) {
 		this.browser=browser;
 	}
+	
 }
