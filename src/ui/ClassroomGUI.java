@@ -21,11 +21,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import model.Classroom;
 import model.UserAccount;
 
@@ -89,7 +92,7 @@ public class ClassroomGUI {
     private DatePicker txtBirthday;
     
     @FXML
-    private Label txtUser;
+    private Label selectUser;
     
     @FXML
     private ChoiceBox<String> txtBrowser;
@@ -121,9 +124,12 @@ public class ClassroomGUI {
     @FXML
     private TableColumn<UserAccount, String> tcBrowser;
 
-
     @FXML
     private ImageView selectPicture;
+    
+    private RadioButton rbSelected;
+    
+    Image ima;
     
     public ClassroomGUI(Classroom cl) {
     	classroom = cl;
@@ -157,9 +163,33 @@ public class ClassroomGUI {
     @FXML
     public void optCreateAccount(ActionEvent event) throws IOException {
     	String userName=optUsername.getText();
-    	String password=optPassword.getText();
+    	System.out.println(userName);
     	
-    	if (userName.isEmpty() || password.isEmpty()) {
+    	String password=optPassword.getText();
+    	System.out.println(password);
+    
+    	Image image = ima;
+    	rbSelected= (RadioButton)genderGroup.getSelectedToggle();
+    	
+    	String gender=rbSelected.getText(); 
+    	System.out.println(gender);
+    	
+    	String career="";
+    	if(txtSoftware.isSelected()) {
+    		career+="Software Engineering";
+    	}if (txtTelematic.isSelected()) {
+    		career+="Telematic Engineering";
+    	}if(txtIndustrial.isSelected()){
+    		career+="Industrial Engineering";
+    	}
+    	System.out.println(career);
+    	String birthday=txtBirthday.getValue().toString();
+    	System.out.println(birthday);
+    	String browser=txtBrowser.getValue();
+    	System.out.println(browser);
+    	
+    	classroom.addContact(userName, password, image, gender, career, birthday, browser);
+    	if (userName.isEmpty() || password.isEmpty() || image==null || gender=="" || career=="" || birthday=="" || browser=="") {
         	validationErrorAlert();
         }else{
         	accountCreatedAlert();
@@ -168,24 +198,30 @@ public class ClassroomGUI {
         	Parent accountListPane = fxmlLoader.load();
     		mainPanel.getChildren().clear();
         	mainPanel.getChildren().setAll(accountListPane);
+        	loadContactList();
         	initializeTableView();
         	
-        	optUsername.setText(""); 
-        	optPassword.setText("");
-        	optProfilePic.setText(""); 
-        }
-      	
+        	selectPicture.setImage(ima);
+        	selectUser.setText(userName);
+        }																																																								 
     } 
     
     @FXML
     public void logIn(ActionEvent event) throws IOException {
      	String userName=txtUsername.getText();
      	String password=txtPassword.getText();
+     	
      	if(classroom.validateUser(userName, password)) {
+     		loadContactList();
+     		initializeTableView();
+     		selectPicture.setImage(classroom.lastImage(userName, password));
+     		selectUser.setText(classroom.lastUser(userName, password));
+     		
      		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("account-list.fxml"));
          	fxmlLoader.setController(this);
          	Parent accountListPane = fxmlLoader.load();
          	loginPane.getChildren().setAll(accountListPane);
+         
      	}if(!classroom.validateUser(userName, password)) {
      		loginErrorAlert();
      	}
@@ -229,7 +265,6 @@ public class ClassroomGUI {
 
     @FXML
     public void genderGroup(ActionEvent event) {
-    	genderGroup = new ToggleGroup();
     	txtMale.setToggleGroup(genderGroup);
     	txtFemale.setToggleGroup(genderGroup);
     	txtOther.setToggleGroup(genderGroup);
@@ -242,13 +277,17 @@ public class ClassroomGUI {
     @FXML
     public void selectPicture(ActionEvent event) {
     	FileChooser fc = new FileChooser();
-    	fc.setTitle("select your picture");
-    	File file = fc.showOpenDialog(null);
+    	fc.setTitle("Select your picture");
+    	fc.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
+    	Stage stage = (Stage)registerPane.getScene().getWindow();
+    	File file = fc.showOpenDialog(stage);
     	System.out.println(file.getAbsolutePath());	
+    	
+    	ima= new Image(file.toURI().toString());
     }
     
     @FXML
-    public void loadAddContact(ActionEvent event) throws IOException {
+    public void loadAddContact(ActionEvent even) throws IOException{
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("register.fxml"));
 		
 		fxmlLoader.setController(this);    	
@@ -258,8 +297,7 @@ public class ClassroomGUI {
     	mainPanel.setTop(addAccountListPane);
     }
     
-    @FXML
-    public void loadContactList(ActionEvent event) throws IOException {
+    public void loadContactList() throws IOException {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("account-list.fxml"));
 		
 		fxmlLoader.setController(this);
@@ -267,6 +305,11 @@ public class ClassroomGUI {
     	
 		mainPanel.getChildren().clear();
     	mainPanel.setCenter(accountListPane);
+    	
+    	for(int i=0; i<classroom.getContacts().size(); i++) {
+    		System.out.println(classroom.getContacts().get(i));
+    		System.out.println("Hola");
+    	}
     	initializeTableView();
     }
     
@@ -276,11 +319,11 @@ public class ClassroomGUI {
     	observableList = FXCollections.observableArrayList(classroom.getContacts());
 		tvAccountList.setItems(observableList);
 	
-		tcUsername.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("userName")); 
-		tcGender.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("gender")); 
-		tcCareer.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("career")); 
-		tcBirthday.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("birthday")); 
-		tcBrowser.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("browser")); 
+		tcUsername.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("UserName")); 
+		tcGender.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("Gender")); 
+		tcCareer.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("Career")); 
+		tcBirthday.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("Birthday")); 
+		tcBrowser.setCellValueFactory(new PropertyValueFactory<UserAccount,String>("Browser")); 
 
     }
     
